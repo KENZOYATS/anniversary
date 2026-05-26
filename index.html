@@ -1,0 +1,1750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Anniversary Zie 💕</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;600;700&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+
+  <!-- REPLACE src WITH YOUR SONG FILE PATHS -->
+<audio id="song1" src="s/keshi - Soft Spot (Lyrics).mp3" loop></audio>
+<audio id="song2" src="s/Lauv - I Like Me Better [Official Audio] 0.mp3" loop></audio>
+<audio id="song3" src="s/IV OF SPADES - Kabisado (Official Lyric Video).mp3" loop></audio>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --pink: #FFB6C1;
+      --deep-pink: #FF85A1;
+      --bg: #FFF0F3;
+      --white: #FFFFFF;
+      --blush: #FFD6E0;
+      --gold: #FFD700;
+      --text: #5C3344;
+      --text-mid: #A0527A;
+      --red: #FF4D6D;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      overflow-x: hidden;
+    }
+    body {
+      background-color: var(--bg);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30'%3E%3Ctext x='10' y='20' font-size='10' fill='%23FFB6C1' opacity='0.35'%3E♥%3C/text%3E%3C/svg%3E");
+    }
+
+    .page {
+      width: 100%; min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      position: relative; z-index: 1;
+      padding: 20px;
+      transition: opacity 0.6s;
+    }
+
+    /* PETALS */
+    #petals-container {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 0; overflow: hidden;
+    }
+    .petal {
+      position: absolute; top: -30px;
+      font-size: 14px; color: var(--deep-pink);
+      opacity: 0.7; animation: fall linear infinite;
+      pointer-events: none;
+    }
+    @keyframes fall {
+      0%   { transform: translateY(-30px) rotate(0deg); opacity: 0.8; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* CURSOR TRAIL */
+    .cursor-heart {
+      position: fixed; pointer-events: none;
+      z-index: 9999; font-size: 14px; color: var(--deep-pink);
+      animation: floatUp 0.8s ease-out forwards;
+    }
+    @keyframes floatUp {
+      0%   { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-30px) scale(0.5); }
+    }
+
+    /* BUTTONS */
+    .btn {
+      padding: 12px 32px; border-radius: 50px;
+      border: none; cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: 16px; font-weight: 700;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: inline-block;
+    }
+    .btn:hover { transform: scale(1.08); }
+    .btn-primary { background: var(--deep-pink); color: white; }
+    .btn-primary:hover { box-shadow: 0 0 20px var(--pink); }
+    .btn-outline { background: white; border: 2px solid var(--deep-pink); color: var(--deep-pink); }
+
+    /* PAGE 1 */
+    #page1 { gap: 22px; }
+    #p1gif {
+      width: 150px; height: 150px;
+      object-fit: cover; border-radius: 50%;
+      animation: bounce 1.5s ease-in-out infinite;
+    }
+    @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    @keyframes wiggle { 0%,100% { transform: rotate(0deg); } 25% { transform: rotate(-5deg); } 75% { transform: rotate(5deg); } }
+    @keyframes shake  { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+    @keyframes pulse  { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+    #typewriter-text {
+      font-family: 'Pacifico', cursive;
+      font-size: clamp(16px, 4vw, 22px);
+      color: var(--text); text-align: center;
+      max-width: 480px; min-height: 70px; line-height: 1.5;
+    }
+    #p1-buttons {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      justify-content: center; opacity: 0; transition: opacity 0.8s;
+    }
+    #p1-buttons .btn { animation: wiggle 1s ease-in-out 0.5s 3; }
+
+    /* PAGE 2 GAME */
+    #page2 { gap: 12px; padding: 10px; }
+    #game-hint { font-size: 15px; color: var(--text-mid); text-align: center; max-width: 360px; }
+    #game-wrapper {
+      position: relative; border-radius: 16px;
+      overflow: hidden; box-shadow: 0 8px 30px rgba(255,133,161,0.4);
+    }
+    #gameCanvas { display: block; background: #FFE4EC; }
+    #game-overlay {
+      display: none; position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%; background: rgba(255,240,243,0.94);
+      flex-direction: column; align-items: center; justify-content: center;
+      gap: 14px; z-index: 10; border-radius: 16px;
+    }
+    #game-overlay.active { display: flex; }
+    #overlay-gif { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; }
+    #overlay-title { font-family: 'Pacifico', cursive; font-size: 20px; color: var(--red); text-align: center; }
+    #overlay-sub { font-size: 14px; color: var(--text-mid); text-align: center; }
+
+    /* PAGE 3 LETTER */
+    #page3 { gap: 18px; padding: 30px 20px 60px; }
+    #p3gif { width: 120px; height: 120px; object-fit: cover; border-radius: 50%; animation: bounce 1.5s ease-in-out infinite; }
+    .sparkle-row { display: flex; gap: 8px; font-size: 22px; }
+    .sparkle { display: inline-block; animation: pulse 2s ease-in-out infinite; }
+    .sparkle:nth-child(2) { animation-delay: 0.4s; }
+    .sparkle:nth-child(3) { animation-delay: 0.8s; }
+    #days-counter {
+      font-family: 'Pacifico', cursive;
+      font-size: clamp(20px, 5vw, 28px);
+      color: var(--deep-pink); animation: pulse 2s ease-in-out infinite; text-align: center;
+    }
+    #wax-seal {
+      font-size: 64px; display: inline-block; cursor: pointer;
+      transition: transform 0.2s;
+      filter: drop-shadow(0 4px 8px rgba(255,77,109,0.4));
+    }
+    @keyframes sealBreak {
+      0%   { transform: scale(1) rotate(0deg); opacity: 1; }
+      40%  { transform: scale(1.3) rotate(-15deg); }
+      60%  { transform: scale(0.9) rotate(10deg); }
+      100% { transform: scale(0) rotate(30deg); opacity: 0; }
+    }
+    #wax-seal.breaking { animation: sealBreak 0.8s forwards; }
+    #open-letter-btn { font-family: 'Pacifico', cursive; font-size: 18px; }
+    #open-letter-btn:hover { box-shadow: 0 0 20px var(--pink); }
+    #letter-card {
+      display: none; background: #FFFDF7;
+      border: 2px solid var(--blush); border-radius: 16px;
+      padding: 2rem; max-width: 500px; width: 100%;
+      box-shadow: 0 8px 30px rgba(255,133,161,0.2);
+      font-family: 'Dancing Script', cursive; font-size: 18px; color: var(--text);
+      position: relative; opacity: 0; transform: translateY(100px);
+      transition: opacity 0.6s, transform 0.6s;
+    }
+    #letter-card.visible { opacity: 1; transform: translateY(0); }
+    #letter-card .letter-corner { position: absolute; font-size: 20px; }
+    #letter-card .corner-tl { top: 10px; left: 14px; }
+    #letter-card .corner-tr { top: 10px; right: 14px; }
+    #letter-card .corner-bl { bottom: 10px; left: 14px; }
+    #letter-card .corner-br { bottom: 10px; right: 14px; }
+    #letter-card h2 {
+      font-family: 'Pacifico', cursive; font-size: 22px;
+      color: var(--deep-pink); text-align: center; margin-bottom: 10px;
+    }
+    .letter-divider { text-align: center; font-size: 20px; margin: 8px 0 16px; color: var(--pink); }
+    #letterContent { line-height: 1.8; white-space: pre-line; }
+    #letter-continue-btn { margin-top: 20px; display: block; margin-left: auto; margin-right: auto; }
+
+    /* PAGE 4 GALLERY */
+    #page4 { align-items: flex-start; justify-content: flex-start; padding: 0 0 100px; }
+    #gallery-header {
+      position: sticky; top: 0; z-index: 50; width: 100%;
+      background: linear-gradient(135deg, var(--deep-pink), #FF4D6D);
+      padding: 18px 24px; display: flex; flex-direction: column;
+      align-items: center; gap: 4px;
+      box-shadow: 0 4px 16px rgba(255,133,161,0.4);
+    }
+    #gallery-header h1 { font-family: 'Pacifico', cursive; font-size: 24px; color: white; }
+    #gallery-days { font-size: 14px; color: rgba(255,255,255,0.9); font-weight: 700; }
+    #gallery-grid {
+      width: 100%; padding: 28px 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px; max-width: 1100px; margin: 0 auto;
+    }
+
+    /* MONTH ALBUM CARD */
+    .month-album-card {
+      background: white; border-radius: 16px;
+      overflow: hidden; cursor: pointer;
+      box-shadow: 0 4px 20px rgba(255,133,161,0.25);
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .month-album-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 12px 32px rgba(255,133,161,0.5);
+    }
+    .album-preview {
+      width: 100%; aspect-ratio: 1;
+      background: var(--blush); position: relative; overflow: hidden;
+    }
+    .album-preview-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr; width: 100%; height: 100%; gap: 2px;
+    }
+    .album-preview-grid img,
+    .album-preview-single img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .album-preview-single { width: 100%; height: 100%; }
+    .album-placeholder {
+      width: 100%; height: 100%; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 8px; color: var(--text-mid); font-size: 13px;
+    }
+    .album-placeholder span { font-size: 40px; }
+    .album-count-badge {
+      position: absolute; bottom: 10px; right: 10px;
+      background: rgba(255,77,109,0.88); color: white;
+      border-radius: 50px; padding: 4px 12px;
+      font-size: 12px; font-weight: 700;
+    }
+    .album-info { padding: 12px 14px 16px; }
+    .album-month-label {
+      font-size: 11px; color: var(--text-mid);
+      font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .album-title { font-family: 'Pacifico', cursive; font-size: 14px; color: var(--text); margin: 4px 0 2px; }
+    .album-date { font-size: 12px; color: var(--text-mid); }
+
+    /* ═══════════════════════════════════
+       SLIDESHOW INTRO OVERLAY
+    ═══════════════════════════════════ */
+    /* ═══════════════════════════════════
+   CINEMATIC SLIDESHOW (Ken Burns + Letterbox)
+═══════════════════════════════════ */
+#slideshow-overlay {
+  display: none;
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #000;
+  z-index: 500;
+  overflow: hidden;
+}
+#slideshow-overlay.active { display: block; }
+
+/* Letterbox bars */
+#ss-letterbox-top, #ss-letterbox-bottom {
+  position: absolute; left: 0; width: 100%;
+  height: 12vh; background: #000; z-index: 4;
+  pointer-events: none;
+}
+#ss-letterbox-top    { top: 0; }
+#ss-letterbox-bottom { bottom: 0; }
+
+/* The actual slide — fills screen behind letterbox */
+.ss-slide {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  overflow: hidden;
+}
+.ss-slide img, .ss-slide video {
+  position: absolute;
+  width: 100%; height: 100%;
+  top: 0; left: 0;
+  object-fit: contain;
+  transform-origin: center center;
+}
+
+/* Ken Burns animations — 4 directions */
+@keyframes kbZoomInLeft {
+  0%   { transform: scale(1)    translateX(0); }
+  100% { transform: scale(1.15) translateX(-3%); }
+}
+@keyframes kbZoomInRight {
+  0%   { transform: scale(1)    translateX(0); }
+  100% { transform: scale(1.15) translateX(3%); }
+}
+@keyframes kbZoomOutLeft {
+  0%   { transform: scale(1.15) translateX(-3%); }
+  100% { transform: scale(1)    translateX(0); }
+}
+@keyframes kbZoomOutRight {
+  0%   { transform: scale(1.15) translateX(3%); }
+  100% { transform: scale(1)    translateX(0); }
+}
+
+/* Crossfade between slides */
+@keyframes ssFadeIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ssFadeOut { from { opacity: 1; } to { opacity: 0; } }
+.ss-slide.entering { animation: ssFadeIn  0.9s ease forwards; z-index: 2; }
+.ss-slide.leaving  { animation: ssFadeOut 0.9s ease forwards; z-index: 1; }
+
+/* Dark vignette overlay on each slide */
+.ss-vignette {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%; z-index: 3;
+  background: radial-gradient(ellipse at center,
+    transparent 35%,
+    rgba(0,0,0,0.55) 100%);
+  pointer-events: none;
+}
+
+/* Caption */
+#ss-caption {
+  position: absolute;
+  bottom: 15vh; left: 0; right: 0;
+  z-index: 5;
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(20px, 4vw, 30px);
+  color: rgba(255,230,235,0.95);
+  text-align: center;
+  text-shadow: 0 2px 16px rgba(0,0,0,0.7);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.7s 0.5s, transform 0.7s 0.5s;
+  padding: 0 5%;
+  pointer-events: none;
+}
+#ss-caption.visible { opacity: 1; transform: translateY(0); }
+
+/* Month title top-left */
+#ss-month-title {
+  position: absolute; top: 13vh; left: 24px;
+  z-index: 5;
+  font-family: 'Pacifico', cursive;
+  font-size: 16px;
+  color: rgba(255,210,220,0.9);
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+/* Counter top-right */
+#ss-counter {
+  position: absolute; top: 13vh; right: 20px;
+  z-index: 5;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px; font-weight: 700;
+  color: rgba(255,210,220,0.75);
+  background: rgba(0,0,0,0.35);
+  padding: 5px 14px; border-radius: 50px;
+  backdrop-filter: blur(4px);
+}
+
+/* Dots */
+#ss-dots {
+  position: absolute; bottom: 13vh; left: 0; right: 0;
+  display: flex; justify-content: center; gap: 8px;
+  z-index: 5;
+}
+.ss-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(255,133,161,0.4);
+  transition: background 0.3s, transform 0.3s;
+}
+.ss-dot.active { background: var(--deep-pink); transform: scale(1.5); }
+
+/* Skip button */
+#ss-skip {
+  position: absolute; bottom: 14vh; right: 20px;
+  z-index: 6;
+  background: rgba(255,133,161,0.18);
+  border: 1.5px solid rgba(255,133,161,0.5);
+  color: rgba(255,220,230,0.9);
+  border-radius: 50px; padding: 8px 22px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s, transform 0.2s;
+}
+#ss-skip:hover { background: rgba(255,133,161,0.35); transform: scale(1.05); }
+
+/* Progress bar */
+#ss-progress {
+  position: absolute; bottom: 0; left: 0;
+  height: 3px; background: var(--deep-pink);
+  z-index: 6; box-shadow: 0 0 8px var(--deep-pink);
+  transition: width linear;
+}
+
+/* Floating hearts bg */
+#ss-hearts {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; z-index: 1; overflow: hidden;
+}
+.ss-heart {
+  position: absolute; font-size: 18px; opacity: 0;
+  animation: ssHeartFloat linear infinite;
+  color: rgba(255,133,161,0.4);
+}
+@keyframes ssHeartFloat {
+  0%   { opacity: 0; transform: translateY(0) rotate(0deg) scale(0.5); }
+  15%  { opacity: 0.8; }
+  85%  { opacity: 0.4; }
+  100% { opacity: 0; transform: translateY(-100vh) rotate(360deg) scale(1.2); }
+}
+
+    /* MONTH VIEWER */
+    #month-viewer {
+      display: none; position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%; background: var(--bg);
+      z-index: 300; overflow-y: auto; flex-direction: column;
+    }
+    #month-viewer.active {
+      display: flex;
+      animation: viewerSlideUp 0.45s cubic-bezier(0.34, 1.2, 0.64, 1);
+    }
+    @keyframes viewerSlideUp {
+      from { transform: translateY(60px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    #viewer-header {
+      position: sticky; top: 0;
+      background: linear-gradient(135deg, var(--deep-pink), #FF4D6D);
+      padding: 16px 20px; display: flex;
+      align-items: center; gap: 12px; z-index: 10;
+      box-shadow: 0 4px 16px rgba(255,133,161,0.4);
+    }
+    #viewer-back {
+      background: rgba(255,255,255,0.25); border: none; color: white;
+      border-radius: 50%; width: 38px; height: 38px; font-size: 20px;
+      cursor: pointer; flex-shrink: 0; transition: background 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #viewer-back:hover { background: rgba(255,255,255,0.4); }
+    #viewer-title-wrap { flex: 1; }
+    #viewer-title { font-family: 'Pacifico', cursive; font-size: 18px; color: white; display: block; }
+    #viewer-count { font-size: 12px; color: rgba(255,255,255,0.85); font-weight: 700; }
+
+    /* Replay slideshow button */
+    #viewer-replay-btn {
+      background: rgba(255,255,255,0.25); border: none; color: white;
+      border-radius: 50px; padding: 6px 14px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 12px; font-weight: 700; cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    #viewer-replay-btn:hover { background: rgba(255,255,255,0.4); }
+
+    #viewer-grid {
+      padding: 24px 16px 120px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+      gap: 22px; max-width: 1000px; margin: 0 auto; width: 100%;
+    }
+    #viewer-empty {
+      grid-column: 1/-1; text-align: center; padding: 60px 20px;
+      color: var(--text-mid); font-family: 'Dancing Script', cursive; font-size: 22px;
+    }
+
+    /* POLAROID CASCADE */
+    @keyframes polaroidCascade {
+      0% {
+        opacity: 0;
+        transform: translateY(-120px) rotate(var(--rot)) scale(0.45);
+        filter: blur(4px);
+      }
+      65% {
+        transform: translateY(8px) rotate(var(--rot)) scale(1.05);
+        filter: blur(0);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) rotate(var(--rot)) scale(1);
+      }
+    }
+    .viewer-polaroid {
+      background: white; padding: 10px 10px 38px;
+      border-radius: 3px;
+      box-shadow: 0 4px 16px rgba(255,133,161,0.3);
+      cursor: pointer; opacity: 0;
+      transform: rotate(var(--rot));
+      animation: polaroidCascade 0.55s cubic-bezier(0.34, 1.3, 0.64, 1) forwards;
+    }
+    .viewer-polaroid:hover {
+      z-index: 5; position: relative;
+      transform: rotate(0deg) scale(1.07) !important;
+      box-shadow: 0 10px 28px rgba(255,133,161,0.6);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .viewer-photo {
+      width: 100%; aspect-ratio: 1;
+      object-fit: cover; display: block; border-radius: 1px;
+    }
+    .viewer-caption {
+      text-align: center; padding-top: 8px;
+      font-family: 'Dancing Script', cursive;
+      font-size: 14px; color: var(--text-mid);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* FAB BUTTONS */
+    #add-memory-btn, #viewer-add-btn {
+      position: fixed; bottom: 28px; right: 24px;
+      background: var(--deep-pink); color: white;
+      border: none; border-radius: 50px;
+      padding: 14px 22px; font-family: 'Nunito', sans-serif;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      box-shadow: 0 4px 18px rgba(255,133,161,0.5);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    #add-memory-btn { z-index: 200; }
+    #viewer-add-btn { z-index: 400; display: none; }
+    #viewer-add-btn.visible { display: block; }
+    #add-memory-btn:hover, #viewer-add-btn:hover {
+      transform: scale(1.07); box-shadow: 0 6px 24px rgba(255,133,161,0.7);
+    }
+
+    /* LIGHTBOX */
+    #lightbox {
+      display: none; position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%; background: rgba(0,0,0,0.9);
+      z-index: 700; align-items: center; justify-content: center;
+      flex-direction: column; gap: 16px; padding: 20px;
+    }
+    #lightbox.active { display: flex; }
+    #lightbox-img {
+      max-width: 92%; max-height: 72vh;
+      border-radius: 8px; object-fit: contain;
+      box-shadow: 0 0 50px rgba(255,133,161,0.25);
+      animation: lightboxIn 0.3s ease;
+    }
+    @keyframes lightboxIn {
+      from { opacity: 0; transform: scale(0.85); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    #lightbox-caption {
+      color: white; font-family: 'Dancing Script', cursive;
+      font-size: 22px; text-align: center; max-width: 80%;
+    }
+    #lightbox-close {
+      position: absolute; top: 20px; right: 20px;
+      background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.3);
+      color: white; border-radius: 50%; width: 44px; height: 44px;
+      font-size: 20px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    #lightbox-close:hover { background: rgba(255,255,255,0.3); }
+    .lb-nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.3);
+      color: white; border-radius: 50%; width: 46px; height: 46px;
+      font-size: 24px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .lb-nav:hover { background: rgba(255,255,255,0.3); }
+    #lb-prev { left: 16px; }
+    #lb-next { right: 16px; }
+
+    /* MODALS */
+    .modal-overlay {
+      display: none; position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%; background: rgba(0,0,0,0.4);
+      z-index: 500; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-card {
+      background: white; border-radius: 20px; padding: 2rem;
+      max-width: 420px; width: 100%;
+      box-shadow: 0 10px 40px rgba(255,133,161,0.3);
+      display: flex; flex-direction: column; gap: 14px;
+      max-height: 92vh; overflow-y: auto;
+    }
+    .modal-card h3 {
+      font-family: 'Pacifico', cursive; font-size: 20px;
+      color: var(--deep-pink); text-align: center;
+    }
+    .modal-input {
+      width: 100%; padding: 12px 20px;
+      border: 2px solid var(--blush); border-radius: 50px;
+      font-family: 'Nunito', sans-serif; font-size: 14px; color: var(--text); outline: none;
+    }
+    .modal-input:focus { border-color: var(--deep-pink); }
+    textarea.modal-input { border-radius: 16px; resize: vertical; padding: 12px 16px; min-height: 80px; }
+    .modal-error { color: var(--red); font-size: 13px; text-align: center; }
+    label.form-label { font-size: 13px; font-weight: 700; color: var(--text-mid); display: block; margin-bottom: 4px; }
+
+    /* UPLOAD PROGRESS */
+    #upload-progress-wrap {
+      display: none;
+      flex-direction: column; gap: 8px;
+    }
+    #upload-progress-wrap.active { display: flex; }
+    #upload-progress-bar-track {
+      width: 100%; height: 8px;
+      background: var(--blush); border-radius: 50px; overflow: hidden;
+    }
+    #upload-progress-bar {
+      height: 100%; background: var(--deep-pink);
+      border-radius: 50px; transition: width 0.3s;
+      width: 0%;
+    }
+    #upload-progress-label {
+      font-size: 13px; text-align: center; color: var(--text-mid);
+      font-weight: 700;
+    }
+
+    /* File drop zone */
+    #photo-drop-zone {
+      border: 2.5px dashed var(--blush);
+      border-radius: 16px; padding: 24px 20px;
+      text-align: center; cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+    }
+    #photo-drop-zone:hover, #photo-drop-zone.drag-over {
+      border-color: var(--deep-pink);
+      background: rgba(255,133,161,0.05);
+    }
+    #photo-drop-zone input[type="file"] {
+      position: absolute; inset: 0;
+      opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    #drop-zone-icon { font-size: 36px; margin-bottom: 8px; }
+    #drop-zone-text { font-size: 14px; color: var(--text-mid); font-weight: 700; }
+    #drop-zone-sub { font-size: 12px; color: var(--text-mid); margin-top: 4px; }
+    #selected-count-badge {
+      display: none;
+      background: var(--deep-pink); color: white;
+      border-radius: 50px; padding: 4px 14px;
+      font-size: 12px; font-weight: 700;
+      margin-top: 8px; text-align: center;
+    }
+    #selected-count-badge.visible { display: block; }
+/* VIDEO BADGE */
+.video-badge {
+  position: absolute; top: 8px; left: 8px;
+  background: rgba(0,0,0,0.6);
+  color: white; font-size: 11px; font-weight: 700;
+  padding: 3px 8px; border-radius: 50px;
+  z-index: 2; pointer-events: none;
+  backdrop-filter: blur(4px);
+}
+.polaroid-media-wrap {
+  position: relative; width: 100%; aspect-ratio: 1;
+}
+.viewer-photo, .viewer-video-thumb {
+  width: 100%; height: 100%;
+  object-fit: cover; display: block; border-radius: 1px;
+}
+
+/* LIGHTBOX VIDEO */
+#lightbox-video {
+  display: none;
+  max-width: 92%; max-height: 72vh;
+  border-radius: 8px;
+  box-shadow: 0 0 50px rgba(255,133,161,0.25);
+  animation: lightboxIn 0.3s ease;
+}
+#lightbox-video.active { display: block; }
+#lightbox-img.hidden { display: none; }
+
+/* VIDEO SLIDE — no Ken Burns, just plays */
+.ss-slide.is-video img,
+.ss-slide.is-video video {
+  object-fit: contain;
+}
+/* DELETE BUTTON ON POLAROID */
+.delete-btn {
+  position: absolute; top: 6px; right: 6px;
+  background: rgba(255,77,109,0.85);
+  border: none; color: white;
+  border-radius: 50%; width: 26px; height: 26px;
+  font-size: 13px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 10; opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+  backdrop-filter: blur(4px);
+}
+.viewer-polaroid:hover .delete-btn { opacity: 1; }
+.delete-btn:hover { transform: scale(1.2); background: var(--red); }    
+/* TOAST */
+    #toast {
+      position: fixed; bottom: 80px; left: 50%;
+      transform: translateX(-50%) translateY(30px);
+      background: var(--deep-pink); color: white;
+      padding: 12px 28px; border-radius: 50px;
+      font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700;
+      z-index: 999; opacity: 0;
+      transition: opacity 0.3s, transform 0.3s; pointer-events: none;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* CONFETTI & HEARTS */
+    .confetti-piece {
+      position: fixed; pointer-events: none;
+      width: 8px; height: 8px; border-radius: 2px; z-index: 9998;
+      animation: confettiFly 1.2s ease-out forwards;
+    }
+    @keyframes confettiFly {
+      0%   { opacity: 1; transform: translate(0,0) rotate(0deg) scale(1); }
+      100% { opacity: 0; transform: translate(var(--tx), var(--ty)) rotate(720deg) scale(0); }
+    }
+    .heart-burst {
+      position: fixed; pointer-events: none; font-size: 22px; z-index: 9997;
+      animation: heartFly 1s ease-out forwards;
+    }
+    @keyframes heartFly {
+      0%   { opacity: 1; transform: translate(0,0) scale(1); }
+      100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.3); }
+    }
+
+    @media (max-width: 500px) {
+      #gallery-grid { grid-template-columns: 1fr 1fr; gap: 12px; padding: 14px; }
+      #viewer-grid  { grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 14px; padding: 16px 12px 100px; }
+    }
+    @media (max-width: 360px) {
+      #gallery-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="petals-container"></div>
+
+<!-- PAGE 1: WELCOME -->
+<div id="page1" class="page">
+  <img id="p1gif" src="https://media.tenor.com/wnMwRlqdkNAAAAAi/cute-bear.gif" alt="cute bear" />
+  <p id="typewriter-text"></p>
+  <div id="p1-buttons">
+    <button class="btn btn-primary" id="btn-yes" onclick="handleYes()">Yes please! 🎀</button>
+    <button class="btn btn-outline"  id="btn-no"  onclick="handleNo()">No, thanks 🙄</button>
+  </div>
+</div>
+
+<!-- PAGE 2: GAME -->
+<div id="page2" class="page" style="display:none;opacity:0;">
+  <p id="game-hint">Tap / Click to flap! Reach 20 points to unlock your gift! 💕</p>
+  <div id="game-wrapper">
+    <canvas id="gameCanvas" width="360" height="500"></canvas>
+    <div id="game-overlay">
+      <img id="overlay-gif" src="https://media.tenor.com/wnMwRlqdkNAAAAAi/cute-bear.gif" alt="">
+      <p id="overlay-title">Game Over!</p>
+      <p id="overlay-sub">Try again 🥺</p>
+      <button class="btn btn-primary" id="overlay-btn" onclick="restartGame()">Try Again 💪</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3: LETTER -->
+<div id="page3" class="page" style="display:none;opacity:0;padding-top:40px;">
+  <img id="p3gif" src="https://media.tenor.com/wnMwRlqdkNAAAAAi/cute-bear.gif" alt="cute bear">
+  <div class="sparkle-row">
+    <span class="sparkle">✨</span><span class="sparkle">💕</span><span class="sparkle">✨</span>
+  </div>
+  <div id="days-counter">💕 Loading...</div>
+  <div id="wax-seal-wrap">
+    <div id="wax-seal" onclick="breakSeal()">💌</div>
+    <button class="btn btn-primary" id="open-letter-btn" style="display:none;" onclick="revealLetter()">💌 Open Your Letter</button>
+  </div>
+  <div id="letter-card">
+    <span class="letter-corner corner-tl">🌸</span>
+    <span class="letter-corner corner-tr">💕</span>
+    <span class="letter-corner corner-bl">✿</span>
+    <span class="letter-corner corner-br">🌸</span>
+    <h2>Happy First Anniversary Baby 🎀</h2>
+    <div class="letter-divider">✿ ♥ ✿</div>
+    <p id="letterContent">My dearest Zie,
+
+HIII MAHALLL KOOOOO UNA SA LAHATTTT HAPPY FIRST ANNIVERSARY BABY!!! and sana po naging masaya ang baby ko sa gift ni aj nato promise po aj will bawiiii moree sa future kapos lng aj now pero baby i wanna make sure u will happy  sa aniv natin baby ko mahal na mahal kita please tulad ng lagi natin sabi no iwan!!!
+
+MY ZIEEEE thankyousomuch po dahil binago mooo life j!! real noo jokeee simula dumating ziee naging complete lahat kay aj parang lahat kaya gawin j basta andyan ziee at  kasama kita thankyou love and thankyou god dahil give ka nya sakin and bb koo pasensya napo ikaw dahil aj nagiging busy madalas dahil sa hilig ni j sa ml at sa mga naging away po natin mahal  sorry po sa lahat and sana bb sa susunod na year natin maging ganto padin po tayo ka strong i promise ziee wala u ibang magiging problema kay j lalu na sa babae TRUST J! only playy or maybe sleep den ahahahahhaha jkkk love baby ko diko napo papahabain to i just want you to know how special zieee for j and kahit walang pera j walang time gagawa at gagawa ako ng paraan mapasaya lng kita mahal sana po mag stay kaparin kay j hanggang sa maging successful us i love you so much baby!!! enjoy your gift  unli to magagamit ng zieee mwahhh and hindi mawawala i love youuuuuuuuuuuuu grrr HAPPY ANNIVERSARY BABY
+
+Forever yours,
+JJ 💕</p>
+    <button class="btn btn-outline" id="letter-continue-btn" onclick="openExitPopup()">Exit 🚪</button>
+  </div>
+</div>
+
+<!-- PAGE 4: GALLERY -->
+<div id="page4" class="page" style="display:none;opacity:0;min-height:100vh;justify-content:flex-start;padding:0;">
+  <div id="gallery-header">
+    <h1>Our Journey 💕</h1>
+    <div id="gallery-days"></div>
+  </div>
+  <div id="gallery-grid"></div>
+  <button id="add-memory-btn" onclick="openPasswordModal('addMonth')">+ Add Month 💕</button>
+</div>
+
+<!-- CINEMATIC SLIDESHOW OVERLAY -->
+<div id="slideshow-overlay">
+  <div id="ss-hearts"></div>
+  <div id="ss-letterbox-top"></div>
+  <div id="ss-letterbox-bottom"></div>
+  <div id="ss-slide-container"></div>
+  <div id="ss-month-title"></div>
+  <div id="ss-counter"></div>
+  <p id="ss-caption"></p>
+  <div id="ss-dots"></div>
+  <button id="ss-skip" onclick="skipSlideshow()">View All ✨</button>
+  <div id="ss-progress"></div>
+</div>
+
+<!-- MONTH VIEWER -->
+<div id="month-viewer">
+  <div id="viewer-header">
+    <button id="viewer-back" onclick="closeMonthViewer()">←</button>
+    <div id="viewer-title-wrap">
+      <span id="viewer-title">Month</span>
+      <span id="viewer-count">0 photos</span>
+    </div>
+    <button id="viewer-replay-btn" onclick="replaySlideshow()">▶ Replay 💕</button>
+  </div>
+  <div id="viewer-grid"></div>
+</div>
+<button id="viewer-add-btn" onclick="openPasswordModal('addPhoto')">+ Add Photo 💕</button>
+
+<!-- LIGHTBOX -->
+<div id="lightbox">
+  <button id="lightbox-close" onclick="closeLightbox()">✕</button>
+  <button class="lb-nav" id="lb-prev" onclick="lightboxNav(-1)">‹</button>
+ <img id="lightbox-img" src="" alt="">
+<video id="lightbox-video" controls playsinline></video>
+  <p id="lightbox-caption"></p>
+  <button class="lb-nav" id="lb-next" onclick="lightboxNav(1)">›</button>
+</div>
+
+<!-- EXIT TRICK MODAL -->
+<div class="modal-overlay" id="exit-modal">
+  <div class="modal-card" style="text-align:center;gap:18px;">
+    <img src="https://media.tenor.com/wnMwRlqdkNAAAAAi/cute-bear.gif"
+         style="width:110px;height:110px;border-radius:50%;margin:0 auto;display:block;animation:bounce 1.5s ease-in-out infinite;">
+    <h3 style="font-size:21px;line-height:1.6;">
+      OOPS MY ZIEE 😭<br>MY WIFEY, MY BABYY<br>IM NOT DONEEEEE 🥺💕
+    </h3>
+    <p style="font-size:17px;color:var(--text-mid);font-family:'Dancing Script',cursive;">
+      There's still so much more for you baby... 🌸
+    </p>
+    <button class="btn btn-primary" style="width:100%;" onclick="closeExitAndGoGallery()">
+      Okay fine 🥺💕
+    </button>
+  </div>
+</div>
+
+<!-- PASSWORD MODAL -->
+<div class="modal-overlay" id="pw-modal">
+  <div class="modal-card">
+    <h3>Enter password 🔐</h3>
+    <input class="modal-input" type="password" id="pw-input" placeholder="Password..."
+           onkeydown="if(event.key==='Enter')checkPassword()">
+    <p class="modal-error" id="pw-error" style="display:none;">Wrong password baby 🙈</p>
+    <button class="btn btn-primary" style="width:100%;" onclick="checkPassword()">Unlock 💕</button>
+    <button class="btn btn-outline"  style="width:100%;margin-top:-8px;" onclick="closeModal('pw-modal')">Cancel</button>
+  </div>
+</div>
+
+<!-- ADD MONTH MODAL -->
+<div class="modal-overlay" id="add-month-modal">
+  <div class="modal-card">
+    <h3>Add New Month 💕</h3>
+    <div>
+      <label class="form-label">Month label</label>
+      <input class="modal-input" type="text" id="month-label-input" placeholder="e.g. Month 13">
+    </div>
+    <div>
+      <label class="form-label">Month title</label>
+      <input class="modal-input" type="text" id="month-title-input" placeholder="e.g. Our Favorite Day 🌸">
+    </div>
+    <div>
+      <label class="form-label">Date</label>
+      <input class="modal-input" type="text" id="month-date-input" placeholder="e.g. June 2026">
+    </div>
+    <div>
+      <label class="form-label">Caption / note</label>
+      <textarea class="modal-input" id="month-caption-input" placeholder="Write something sweet..."></textarea>
+    </div>
+    <button class="btn btn-primary" style="width:100%;" onclick="saveNewMonth()">Save Month 💕</button>
+    <button class="btn btn-outline"  style="width:100%;margin-top:-8px;" onclick="closeModal('add-month-modal')">Cancel</button>
+  </div>
+</div>
+
+<!-- ADD PHOTO MODAL — NOW WITH MULTI-UPLOAD -->
+<div class="modal-overlay" id="add-photo-modal">
+  <div class="modal-card">
+    <h3>Add Photos 📷</h3>
+
+    <!-- Drop zone with multi-file support -->
+    <div id="photo-drop-zone">
+      <input type="file" id="photo-file-input" accept="image/*,video/*" multiple
+       onchange="onFilesSelected(this.files)">
+      <div id="drop-zone-icon">📸</div>
+      <div id="drop-zone-text">Tap to select photos</div>
+    <div id="drop-zone-sub">Photos & videos welcome! 💕</div>
+    </div>
+    <div id="selected-count-badge"></div>
+
+    <div>
+      <label class="form-label">Shared caption for all photos (optional)</label>
+      <input class="modal-input" type="text" id="photo-caption-input" placeholder="A sweet little note...">
+    </div>
+
+    <!-- Upload progress -->
+    <div id="upload-progress-wrap">
+      <div id="upload-progress-bar-track">
+        <div id="upload-progress-bar"></div>
+      </div>
+      <div id="upload-progress-label">Processing... 💕</div>
+    </div>
+
+    <p style="font-size:12px;color:var(--text-mid);text-align:center;">
+      Auto-compressed 🌸 Add up to 50+ photos at once!
+    </p>
+    <button class="btn btn-primary" style="width:100%;" id="save-photos-btn" onclick="savePhotos()">Save Photos 💕</button>
+    <button class="btn btn-outline"  style="width:100%;margin-top:-8px;" onclick="closeModal('add-photo-modal')">Cancel</button>
+  </div>
+</div>
+<!-- DELETE CONFIRM MODAL -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal-card" style="text-align:center;gap:18px;">
+    <div style="font-size:48px;">🗑️</div>
+    <h3>Delete this memory?</h3>
+    <p style="font-size:14px;color:var(--text-mid);">This can't be undone 🥺</p>
+    <button class="btn btn-primary" style="width:100%;background:var(--red);" id="delete-confirm-btn">Yes, delete 🗑️</button>
+    <button class="btn btn-outline" style="width:100%;" onclick="closeModal('delete-modal')">Cancel 💕</button>
+  </div>
+</div>
+<div id="toast">Saved! 💕</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<script>
+
+// ============================================================
+//  SUPABASE
+// ============================================================
+const SUPABASE_URL = 'https://mvyxycrwffdnufjtlwac.supabase.co'; // ✅ CORRECT
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12eXh5Y3J3ZmZkbnVmanRsd2FjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NTg1NjIsImV4cCI6MjA5NTMzNDU2Mn0.NjCujJAhg2hMtcVNBCC62FoyVn1gX7Rwr__Qxe5t-e0';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ============================================================
+//  DATA
+// ============================================================
+let memories = [];
+let images   = [];
+let currentMonthIndex = 0;
+let lightboxIdx       = 0;
+let pendingAction     = '';
+let selectedFiles     = [];
+let deleteTargetIndex = -1;
+
+async function initData() {
+  const { data: monthsData } = await sb.from('months').select('*').order('order_index');
+  if (!monthsData) return;
+  memories = monthsData.map(m => ({
+    id: m.id,
+    month: m.month_label,
+    title: m.title,
+    date: m.date_label,
+    caption: m.caption
+  }));
+  images = memories.map(() => []);
+
+  const { data: photosData } = await sb.from('photos').select('*').order('created_at');
+  if (photosData) {
+    photosData.forEach(p => {
+      if (p.month_index >= 0 && p.month_index < images.length) {
+        const { data: urlData } = sb.storage.from('photos').getPublicUrl(p.storage_path);
+        images[p.month_index].push({
+          id: p.id,
+          src: urlData.publicUrl,
+          caption: p.caption,
+          isVideo: p.is_video,
+          storagePath: p.storage_path
+        });
+      }
+    });
+  }
+}
+initData();
+// ============================================================
+//  DELETE MEDIA
+// ============================================================
+function askDelete(imgIndex, e) {
+  e.stopPropagation();
+  deleteTargetIndex = imgIndex;
+  document.getElementById('delete-modal').classList.add('active');
+  document.getElementById('delete-confirm-btn').onclick = confirmDelete;
+}
+async function confirmDelete() {
+  if(deleteTargetIndex < 0) return;
+  const photo = images[currentMonthIndex][deleteTargetIndex];
+
+  if(photo.storagePath) {
+    await sb.storage.from('photos').remove([photo.storagePath]);
+  }
+  if(photo.id) {
+    await sb.from('photos').delete().eq('id', photo.id);
+  }
+
+  images[currentMonthIndex].splice(deleteTargetIndex, 1);
+  closeModal('delete-modal');
+  renderViewerGrid(images[currentMonthIndex]);
+  renderGallery();
+  deleteTargetIndex = -1;
+  showToast('Deleted 🗑️');
+}
+// ============================================================
+//  PETALS
+// ============================================================
+(function() {
+  const c = document.getElementById('petals-container');
+  const emojis = ['♥','♥','🌸','✿','💕'];
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'petal';
+    p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    p.style.left = Math.random() * 100 + '%';
+    p.style.fontSize = (8 + Math.random() * 8) + 'px';
+    p.style.animationDuration  = (4 + Math.random() * 6).toFixed(2) + 's';
+    p.style.animationDelay     = '-' + (Math.random() * 8).toFixed(2) + 's';
+    c.appendChild(p);
+  }
+})();
+
+// ============================================================
+//  CURSOR TRAIL
+// ============================================================
+document.addEventListener('mousemove', (e) => {
+  const h = document.createElement('div');
+  h.className = 'cursor-heart'; h.textContent = '♥';
+  h.style.left = e.clientX + 'px'; h.style.top = e.clientY + 'px';
+  document.body.appendChild(h);
+  setTimeout(() => h.remove(), 800);
+});
+
+// ============================================================
+//  PAGE TRANSITIONS
+// ============================================================
+function goToPage(fromId, toId, displayType) {
+  const from = document.getElementById(fromId);
+  const to   = document.getElementById(toId);
+  from.style.opacity = '0'; from.style.transition = 'opacity 0.6s';
+  setTimeout(() => {
+    from.style.display = 'none';
+    to.style.display = displayType || 'flex';
+    to.style.opacity = '0'; to.style.transition = 'opacity 0.6s';
+    setTimeout(() => { to.style.opacity = '1'; }, 50);
+  }, 600);
+}
+
+// ============================================================
+//  PAGE 1 — TYPEWRITER
+// ============================================================
+const fullText = "Hello my baby Zie, do you want to see your anniversary gift from JJ? 🎀";
+let twIdx = 0;
+const typeEl  = document.getElementById('typewriter-text');
+const btnWrap = document.getElementById('p1-buttons');
+function typeWriter() {
+  if (twIdx < fullText.length) { typeEl.textContent += fullText[twIdx++]; setTimeout(typeWriter, 60); }
+  else { btnWrap.style.opacity = '1'; }
+}
+setTimeout(typeWriter, 500);
+
+let noClicked = false;
+function handleNo() {
+  if (noClicked) return; noClicked = true;
+  document.getElementById('p1gif').src = 'https://media.tenor.com/2bHaRmFYCEoAAAAi/sad-crying.gif';
+  document.getElementById('p1gif').style.animation = 'shake 0.4s, bounce 1.5s ease-in-out infinite 0.4s';
+  typeEl.textContent = "Babyyyy 😭 please? I promise you'll love it! 🥺💕";
+  const b = document.getElementById('btn-no');
+  b.textContent = 'Okay fine... 🥺'; b.className = 'btn btn-primary'; b.onclick = handleYes;
+}
+function handleYes() { goToPage('page1','page2'); setTimeout(startGame, 700); }
+
+// ============================================================
+//  PAGE 2 — FLAPPY BIRD
+// ============================================================
+const canvas  = document.getElementById('gameCanvas');
+const ctx     = canvas.getContext('2d');
+const overlay = document.getElementById('game-overlay');
+const oGif    = document.getElementById('overlay-gif');
+const oTitle  = document.getElementById('overlay-title');
+const oSub    = document.getElementById('overlay-sub');
+
+const GRAVITY=0.25, FLAP=-6, SPEED=1.8, GAP=200, INTERVAL=90, PW=52, WIN=3;
+let bird, pipes, score, frame, raf, gameRunning;
+
+function initGame() {
+  bird={x:80,y:200,velocity:0,size:24}; pipes=[]; score=0; frame=0; gameRunning=true;
+  overlay.classList.remove('active');
+}
+function startGame() {
+  initGame();
+  canvas.addEventListener('click', flap);
+  canvas.addEventListener('touchstart', flap, {passive:true});
+  document.addEventListener('keydown', flapKey);
+  loop();
+}
+function flapKey(e) { if(e.code==='Space'||e.code==='ArrowUp') flap(); }
+function flap() { if(gameRunning) bird.velocity=FLAP; }
+function loop() { if(!gameRunning) return; update(); draw(); raf=requestAnimationFrame(loop); }
+
+function update() {
+  frame++;
+  bird.velocity+=GRAVITY; bird.y+=bird.velocity;
+  if(frame%INTERVAL===0) {
+    const topH=60+Math.random()*(canvas.height-GAP-120);
+    pipes.push({x:canvas.width,topH,passed:false});
+  }
+  for(let p of pipes) {
+    p.x-=SPEED;
+    if(!p.passed&&p.x+PW<bird.x) {
+      p.passed=true; score++;
+      if(score>=WIN){gameRunning=false;cancelAnimationFrame(raf);gameWin();return;}
+    }
+  }
+  pipes=pipes.filter(p=>p.x>-PW-10);
+  if(bird.y+bird.size/2>canvas.height||bird.y-bird.size/2<0){gameOver();return;}
+  for(let p of pipes) {
+    const bs=bird.size*0.7;
+    if(bird.x+bs>p.x&&bird.x-bs<p.x+PW)
+      if(bird.y-bs<p.topH||bird.y+bs>p.topH+GAP){gameOver();return;}
+  }
+}
+function draw() {
+  const g=ctx.createLinearGradient(0,0,0,canvas.height);
+  g.addColorStop(0,'#FFE4EC'); g.addColorStop(1,'#FFF0F3');
+  ctx.fillStyle=g; ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle='#FF85A1'; ctx.globalAlpha=0.85;
+  for(let p of pipes) {
+    rr(ctx,p.x,0,PW,p.topH,[0,0,10,10]); ctx.fill();
+    rr(ctx,p.x,p.topH+GAP,PW,canvas.height-p.topH-GAP,[10,10,0,0]); ctx.fill();
+  }
+  ctx.globalAlpha=1;
+  ctx.font=bird.size+'px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('♥',bird.x,bird.y);
+  ctx.font="bold 16px 'Nunito',sans-serif"; ctx.fillStyle='#5C3344';
+  ctx.textAlign='right'; ctx.textBaseline='top';
+  ctx.fillText('Score: '+score+' / '+WIN,canvas.width-10,10);
+}
+function rr(ctx,x,y,w,h,r) { ctx.beginPath(); ctx.roundRect?ctx.roundRect(x,y,w,h,r):ctx.rect(x,y,w,h); }
+
+function gameOver() {
+  gameRunning=false; cancelAnimationFrame(raf);
+  oGif.src='https://media.tenor.com/2bHaRmFYCEoAAAAi/sad-crying.gif';
+  oTitle.textContent='BABYYYY GALINGAN MOO 😭💕';
+  oSub.textContent='You can do it!! Try again 🥺';
+  document.getElementById('overlay-btn').textContent='Try Again 💪';
+  document.getElementById('overlay-btn').onclick=restartGame;
+  overlay.classList.add('active');
+}
+function restartGame() { overlay.classList.remove('active'); initGame(); loop(); }
+function gameWin() {
+  try { document.getElementById('song1').play(); } catch(e) {}
+  oGif.src='https://media.tenor.com/wnMwRlqdkNAAAAAi/cute-bear.gif';
+  oTitle.textContent='YAY YOU DID IT BABY! 🎉💕';
+  oSub.textContent='Your gift is ready! ✨';
+  document.getElementById('overlay-btn').style.display='none';
+  overlay.classList.add('active'); spawnConfetti();
+  setTimeout(() => { spawnHeartBurst(); goToPage('page2','page3'); initPage3(); }, 2500);
+}
+
+// ============================================================
+//  CONFETTI & HEARTS
+// ============================================================
+function spawnConfetti() {
+  const cols=['#FF85A1','#FFB6C1','#FFD700','#FF4D6D','#A0527A','#FFD6E0'];
+  for(let i=0;i<40;i++) {
+    const c=document.createElement('div'); c.className='confetti-piece';
+    c.style.background=cols[Math.floor(Math.random()*cols.length)];
+    c.style.left=(40+Math.random()*20)+'%'; c.style.top='40%';
+    const a=Math.random()*Math.PI*2, d=80+Math.random()*160;
+    c.style.setProperty('--tx',Math.cos(a)*d+'px');
+    c.style.setProperty('--ty',Math.sin(a)*d+'px');
+    c.style.animationDuration=(0.8+Math.random()*0.6)+'s';
+    document.body.appendChild(c); setTimeout(()=>c.remove(),1500);
+  }
+}
+function spawnHeartBurst() {
+  for(let i=0;i<20;i++) {
+    const h=document.createElement('div'); h.className='heart-burst'; h.textContent='♥';
+    h.style.left='50%'; h.style.top='50%';
+    const a=(i/20)*Math.PI*2, d=80+Math.random()*120;
+    h.style.setProperty('--tx',Math.cos(a)*d+'px');
+    h.style.setProperty('--ty',Math.sin(a)*d+'px');
+    document.body.appendChild(h); setTimeout(()=>h.remove(),1200);
+  }
+}
+
+// ============================================================
+//  PAGE 3 — LETTER
+// ============================================================
+function initPage3() {
+  const days=Math.max(0,Math.floor((new Date()-new Date('2025-05-14'))/(1000*60*60*24)));
+  document.getElementById('days-counter').textContent=days+' days of loving you 💕';
+}
+let sealBroken=false;
+function breakSeal() {
+  if(sealBroken) return; sealBroken=true;
+  const s=document.getElementById('wax-seal'); s.classList.add('breaking');
+  setTimeout(()=>{ s.style.display='none'; document.getElementById('open-letter-btn').style.display='inline-block'; },800);
+}
+function revealLetter() {
+  document.getElementById('open-letter-btn').style.display='none';
+  const card=document.getElementById('letter-card');
+  card.style.display='block'; setTimeout(()=>card.classList.add('visible'),20);
+}
+
+function openExitPopup() { document.getElementById('exit-modal').classList.add('active'); }
+function closeExitAndGoGallery() { document.getElementById('exit-modal').classList.remove('active'); goToGallery(); }
+
+function goToGallery() {
+  const s1=document.getElementById('song1');
+  let vol=s1.volume||1;
+  const fade=setInterval(()=>{
+    vol=Math.max(0,vol-0.1); try{s1.volume=vol;}catch(e){}
+    if(vol<=0){clearInterval(fade);try{s1.pause();}catch(e){}}
+  },100);
+  spawnHeartBurst(); goToPage('page3','page4','block');
+  setTimeout(()=>{
+    try{document.getElementById('song2').play();}catch(e){}
+    renderGallery();
+    const days=Math.max(0,Math.floor((new Date()-new Date('2025-05-14'))/(1000*60*60*24)));
+    document.getElementById('gallery-days').textContent=days+' days of loving you 💕';
+  },700);
+}
+
+// ============================================================
+//  PAGE 4 — GALLERY
+// ============================================================
+function renderGallery() {
+  const grid=document.getElementById('gallery-grid'); grid.innerHTML='';
+  memories.forEach((m,i)=>{
+    const imgs=images[i]||[]; const count=imgs.length;
+    let preview='';
+    if(count===0) {
+      preview=`<div class="album-placeholder"><span>📷</span><small>No photos yet 🌸</small></div>`;
+  } else if(count===1) {
+      const first = imgs[0];
+      preview = first.isVideo
+        ? `<div class="album-preview-single" style="position:relative;">
+             <video src="${first.src}" style="width:100%;height:100%;object-fit:cover;" muted playsinline preload="metadata"></video>
+             <span style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.6);color:white;font-size:11px;font-weight:700;padding:3px 8px;border-radius:50px;">🎬</span>
+           </div>`
+        : `<div class="album-preview-single"><img src="${first.src}" alt=""></div>`;
+    } else {
+      const show = imgs.slice(0, 4);
+      while(show.length < 4) show.push(show[show.length-1]);
+      preview = `<div class="album-preview-grid">${show.map(img =>
+        img.isVideo
+          ? `<div style="position:relative;width:100%;height:100%;">
+               <video src="${img.src}" style="width:100%;height:100%;object-fit:cover;" muted playsinline preload="metadata"></video>
+               <span style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.6);color:white;font-size:9px;font-weight:700;padding:2px 6px;border-radius:50px;">🎬</span>
+             </div>`
+          : `<img src="${img.src}" alt="">`
+      ).join('')}</div>`;
+    }
+    const card=document.createElement('div'); card.className='month-album-card';
+    card.innerHTML=`
+      <div class="album-preview">
+        ${preview}
+        ${count>0?`<div class="album-count-badge">${count} photo${count!==1?'s':''}</div>`:''}
+      </div>
+      <div class="album-info">
+        <p class="album-month-label">${m.month}</p>
+        <p class="album-title">${m.title}</p>
+        <p class="album-date">${m.date}</p>
+      </div>`;
+    card.addEventListener('click',()=>openMonthViewer(i));
+    grid.appendChild(card);
+  });
+}
+
+// ============================================================
+//  SLIDESHOW ENGINE
+// ============================================================
+let ssTimer = null;
+let ssIdx   = 0;
+let ssImgs  = [];
+let ssMonthIndex = 0;
+const SS_DURATION = 3800; // ms per slide (cinematic pace)
+const KB_ANIMS = ['kbZoomInLeft','kbZoomInRight','kbZoomOutLeft','kbZoomOutRight'];
+
+function spawnSlideshowHearts() {
+  const c = document.getElementById('ss-hearts'); c.innerHTML = '';
+  const emojis = ['♥','💕','🌸','✿','💝'];
+  for(let i = 0; i < 14; i++) {
+    const h = document.createElement('div'); h.className = 'ss-heart';
+    h.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    h.style.left = (Math.random()*100)+'%';
+    h.style.fontSize = (10+Math.random()*14)+'px';
+    h.style.animationDuration = (7+Math.random()*9).toFixed(2)+'s';
+    h.style.animationDelay = '-'+(Math.random()*12).toFixed(2)+'s';
+    c.appendChild(h);
+  }
+}
+
+function buildSsDots(total, current) {
+  const wrap = document.getElementById('ss-dots'); wrap.innerHTML = '';
+  const show = Math.min(total, 10);
+  for(let i = 0; i < show; i++) {
+    const d = document.createElement('div'); d.className = 'ss-dot';
+    if(i === current % show) d.classList.add('active');
+    wrap.appendChild(d);
+  }
+}
+
+function createSlide(img, kbAnim, duration) {
+  const slide = document.createElement('div'); slide.className = 'ss-slide';
+  let el;
+  if(img.isVideo) {
+    slide.classList.add('is-video');
+    el = document.createElement('video');
+    el.src = img.src;
+    el.autoplay = true;
+    el.muted = false;
+    el.playsInline = true;
+    el.controls = false;
+    el.style.objectFit = 'contain';
+  } else {
+    el = document.createElement('img');
+    el.src = img.src;
+    el.style.animation = `${kbAnim} ${duration}ms ease-in-out forwards`;
+  }
+  const vig = document.createElement('div'); vig.className = 'ss-vignette';
+  slide.appendChild(el); slide.appendChild(vig);
+  return slide;
+}
+function ssShowPhoto(idx) {
+  const img = ssImgs[idx];
+  const container = document.getElementById('ss-slide-container');
+  const cap = document.getElementById('ss-caption');
+  const kbAnim = KB_ANIMS[idx % KB_ANIMS.length];
+
+  // Remove old leaving slide if exists
+  const oldLeaving = container.querySelector('.leaving');
+  if(oldLeaving) oldLeaving.remove();
+
+  // Mark current slide as leaving
+  const oldEntering = container.querySelector('.entering');
+  if(oldEntering) {
+    oldEntering.classList.remove('entering');
+    oldEntering.classList.add('leaving');
+    setTimeout(() => oldEntering.remove(), 900);
+  }
+
+  // Create and add new slide
+  const slide = createSlide(img, kbAnim, SS_DURATION + 500);
+  slide.classList.add('entering');
+  container.appendChild(slide);
+
+  // Caption
+  cap.classList.remove('visible');
+  cap.textContent = img.caption || '';
+  setTimeout(() => cap.classList.add('visible'), 500);
+
+  // Counter + dots
+  document.getElementById('ss-counter').textContent = (idx+1)+' / '+ssImgs.length;
+  buildSsDots(ssImgs.length, idx);
+
+  // Progress bar reset
+  const bar = document.getElementById('ss-progress');
+  bar.style.transition = 'none'; bar.style.width = '0%';
+  setTimeout(() => {
+    bar.style.transition = `width ${SS_DURATION}ms linear`;
+    bar.style.width = '100%';
+  }, 60);
+}
+
+function endSlideshow() {
+  const ov = document.getElementById('slideshow-overlay');
+  ov.style.transition = 'opacity 0.7s';
+  ov.style.opacity = '0';
+  setTimeout(() => {
+    ov.style.opacity = '';
+    ov.style.transition = '';
+    ov.classList.remove('active');
+    openMonthViewerGrid(ssMonthIndex);
+  }, 700);
+}
+
+function skipSlideshow() {
+  clearInterval(ssTimer);
+  const ov = document.getElementById('slideshow-overlay');
+  ov.style.transition = 'opacity 0.4s';
+  ov.style.opacity = '0';
+  setTimeout(() => {
+    ov.style.opacity = '';
+    ov.style.transition = '';
+    ov.classList.remove('active');
+    openMonthViewerGrid(ssMonthIndex);
+  }, 400);
+}
+function startSlideshow(monthIndex) {
+  ssMonthIndex = monthIndex;
+  ssImgs = images[monthIndex] || [];
+  ssIdx = 0;
+
+  const m = memories[monthIndex];
+  document.getElementById('ss-month-title').textContent = m.title;
+  document.getElementById('ss-caption').classList.remove('visible');
+  document.getElementById('ss-caption').textContent = '';
+
+  // Clear old slides
+  document.getElementById('ss-slide-container').innerHTML = '';
+
+  spawnSlideshowHearts();
+
+  const ov = document.getElementById('slideshow-overlay');
+  ov.classList.add('active');
+
+  setTimeout(() => ssShowPhoto(0), 150);
+
+  clearInterval(ssTimer);
+  ssTimer = setInterval(() => {
+    const nextIdx = ssIdx + 1;
+    if(nextIdx >= ssImgs.length) {
+      clearInterval(ssTimer);
+      endSlideshow();
+    } else {
+      ssIdx = nextIdx;
+      ssShowPhoto(ssIdx);
+    }
+  }, SS_DURATION + 400);
+}
+// ============================================================
+//  MONTH VIEWER
+// ============================================================
+const ROTS = [-3,-2,-1,0,1,2,3,-2.5,2.5,-1.5,1.5,0.5,-0.5];
+
+function openMonthViewer(index) {
+  currentMonthIndex = index;
+  const imgs = images[index] || [];
+
+  // Pause gallery music
+  try{ document.getElementById('song2').pause(); }catch(e){}
+  // Play song3 for slideshow/viewer
+  try{ const s3=document.getElementById('song3'); s3.currentTime=0; s3.play(); }catch(e){}
+
+  if(imgs.length > 0) {
+    // Play slideshow intro first
+    startSlideshow(index);
+  } else {
+    // No photos — go straight to viewer
+    openMonthViewerGrid(index);
+  }
+}
+
+function openMonthViewerGrid(index) {
+  currentMonthIndex = index;
+  const m    = memories[index];
+  const imgs = images[index] || [];
+
+  document.getElementById('viewer-title').textContent = m.title;
+  document.getElementById('viewer-count').textContent = imgs.length+' photo'+(imgs.length!==1?'s':'');
+
+  renderViewerGrid(imgs);
+  const v = document.getElementById('month-viewer');
+  v.classList.add('active'); v.scrollTop = 0;
+  document.getElementById('viewer-add-btn').classList.add('visible');
+}
+
+function replaySlideshow() {
+  const imgs = images[currentMonthIndex] || [];
+  if(imgs.length === 0) { showToast('No photos to replay 🌸'); return; }
+  document.getElementById('month-viewer').classList.remove('active');
+  document.getElementById('viewer-add-btn').classList.remove('visible');
+  startSlideshow(currentMonthIndex);
+}
+
+function closeMonthViewer() {
+  document.getElementById('month-viewer').classList.remove('active');
+  document.getElementById('viewer-add-btn').classList.remove('visible');
+  clearInterval(ssTimer);
+  try{ document.getElementById('song3').pause(); }catch(e){}
+  try{ document.getElementById('song2').play(); }catch(e){}
+}
+
+function renderViewerGrid(imgs) {
+  const grid = document.getElementById('viewer-grid'); grid.innerHTML = '';
+  if(imgs.length === 0) {
+    grid.innerHTML = `<div id="viewer-empty">No photos yet 🌸<br>Add your first memory!</div>`;
+    return;
+  }
+  imgs.forEach((img,i) => {
+    const rot = ROTS[i % ROTS.length];
+    const pol = document.createElement('div');
+    pol.className = 'viewer-polaroid';
+    pol.style.setProperty('--rot', rot+'deg');
+    pol.style.animationDelay = (i * 0.07) + 's';
+ pol.innerHTML = `
+      <div class="polaroid-media-wrap">
+        ${img.isVideo
+          ? `<video class="viewer-video-thumb" src="${img.src}" muted playsinline preload="metadata"></video>
+             <span class="video-badge">🎬 VIDEO</span>`
+          : `<img class="viewer-photo" src="${img.src}" alt="">`
+        }
+        <button class="delete-btn" title="Delete">✕</button>
+      </div>
+      <p class="viewer-caption">${img.caption||'🌸'}</p>`;
+    pol.addEventListener('click', () => openLightbox(i));
+    pol.querySelector('.delete-btn').addEventListener('click', (e) => askDelete(i, e));
+    grid.appendChild(pol);
+  });
+  document.getElementById('viewer-count').textContent = imgs.length+' photo'+(imgs.length!==1?'s':'');
+}
+
+// ============================================================
+//  LIGHTBOX
+// ============================================================
+function openLightbox(index) {
+  lightboxIdx = index; showLightboxImg();
+  document.getElementById('lightbox').classList.add('active');
+}
+function closeLightbox() { document.getElementById('lightbox').classList.remove('active'); }
+function showLightboxImg() {
+  const imgs = images[currentMonthIndex] || [];
+  if(!imgs[lightboxIdx]) return;
+  const item = imgs[lightboxIdx];
+  const imgEl = document.getElementById('lightbox-img');
+  const vidEl = document.getElementById('lightbox-video');
+
+  if(item.isVideo) {
+    imgEl.classList.add('hidden');
+    vidEl.classList.add('active');
+    vidEl.src = item.src;
+    vidEl.load();
+  } else {
+    vidEl.classList.remove('active');
+    vidEl.pause(); vidEl.src = '';
+    imgEl.classList.remove('hidden');
+    imgEl.style.animation = 'none'; void imgEl.offsetWidth;
+    imgEl.style.animation = 'lightboxIn 0.3s ease';
+    imgEl.src = item.src;
+  }
+  document.getElementById('lightbox-caption').textContent = item.caption || '';
+  document.getElementById('lb-prev').style.opacity = lightboxIdx > 0 ? '1' : '0.3';
+  document.getElementById('lb-next').style.opacity = lightboxIdx < imgs.length-1 ? '1' : '0.3';
+}
+function lightboxNav(dir) {
+  const imgs = images[currentMonthIndex] || [];
+  const next = lightboxIdx + dir;
+  if(next < 0 || next >= imgs.length) return;
+  lightboxIdx = next; showLightboxImg();
+}
+document.addEventListener('keydown', (e) => {
+  if(!document.getElementById('lightbox').classList.contains('active')) return;
+  if(e.key === 'ArrowLeft')  lightboxNav(-1);
+  if(e.key === 'ArrowRight') lightboxNav(1);
+  if(e.key === 'Escape')     closeLightbox();
+});
+
+// ============================================================
+//  PASSWORD MODAL
+// ============================================================
+function openPasswordModal(action) {
+  pendingAction = action;
+  document.getElementById('pw-input').value = '';
+  document.getElementById('pw-error').style.display = 'none';
+  document.getElementById('pw-modal').classList.add('active');
+  setTimeout(() => document.getElementById('pw-input').focus(), 200);
+}
+function checkPassword() {
+  const val = document.getElementById('pw-input').value.trim().toUpperCase();
+  if(val === 'KENZOANDZIE') {
+    closeModal('pw-modal');
+    if(pendingAction === 'addPhoto') openAddPhotoModal();
+    else if(pendingAction === 'addMonth') openAddMonthModal();
+  } else {
+    const err = document.getElementById('pw-error');
+    err.style.display = 'block'; err.style.animation = 'none'; void err.offsetWidth; err.style.animation = 'shake 0.4s';
+  }
+}
+function openAddPhotoModal() {
+  selectedFiles = [];
+  document.getElementById('photo-caption-input').value = '';
+  document.getElementById('photo-file-input').value = '';
+  document.getElementById('selected-count-badge').classList.remove('visible');
+  document.getElementById('selected-count-badge').textContent = '';
+  document.getElementById('drop-zone-icon').textContent = '📸';
+  document.getElementById('drop-zone-text').textContent = 'Tap to select photos';
+  document.getElementById('upload-progress-wrap').classList.remove('active');
+  document.getElementById('upload-progress-bar').style.width = '0%';
+  document.getElementById('save-photos-btn').disabled = false;
+  document.getElementById('add-photo-modal').classList.add('active');
+}
+function openAddMonthModal() {
+  document.getElementById('month-label-input').value = 'Month '+(memories.length+1);
+  document.getElementById('month-title-input').value = '';
+  document.getElementById('month-date-input').value = '';
+  document.getElementById('month-caption-input').value = '';
+  document.getElementById('add-month-modal').classList.add('active');
+}
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+// ============================================================
+//  MULTI-FILE SELECTION
+// ============================================================
+function onFilesSelected(files) {
+  if(!files || files.length === 0) return;
+  selectedFiles = Array.from(files);
+  const videos = selectedFiles.filter(f => f.type.startsWith('video/')).length;
+  const photos = selectedFiles.length - videos;
+  const badge = document.getElementById('selected-count-badge');
+  let label = '';
+  if(photos > 0 && videos > 0) label = `${photos} photo${photos!==1?'s':''} + ${videos} video${videos!==1?'s':''} selected 💕`;
+  else if(videos > 0) label = `${videos} video${videos!==1?'s':''} selected 🎬`;
+  else label = `${photos} photo${photos!==1?'s':''} selected 💕`;
+  badge.textContent = label;
+  badge.classList.add('visible');
+  document.getElementById('drop-zone-icon').textContent = '✅';
+  document.getElementById('drop-zone-text').textContent = 'Files ready!';
+}
+
+// Drag & drop
+const dropZone = document.getElementById('photo-drop-zone');
+dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', (e) => {
+  e.preventDefault(); dropZone.classList.remove('drag-over');
+  onFilesSelected(e.dataTransfer.files);
+});
+
+// ============================================================
+//  SAVE PHOTOS — MULTI-UPLOAD WITH PROGRESS
+// ============================================================
+async function savePhotos() {
+  if(selectedFiles.length === 0) { showToast('Please pick at least one photo 🌸'); return; }
+
+  const caption = document.getElementById('photo-caption-input').value.trim();
+  const btn = document.getElementById('save-photos-btn');
+  btn.disabled = true; btn.textContent = 'Saving... 💕';
+
+  const progressWrap = document.getElementById('upload-progress-wrap');
+  const progressBar  = document.getElementById('upload-progress-bar');
+  const progressLbl  = document.getElementById('upload-progress-label');
+  progressWrap.classList.add('active');
+
+  if(!images[currentMonthIndex]) images[currentMonthIndex] = [];
+
+  for(let i = 0; i < selectedFiles.length; i++) {
+    const file = selectedFiles[i];
+    progressBar.style.width = Math.round((i / selectedFiles.length) * 100) + '%';
+    progressLbl.textContent = `Uploading ${i+1} of ${selectedFiles.length}... 🌸`;
+
+    const isVideo = file.type.startsWith('video/');
+    const ext = file.name.split('.').pop();
+    const storagePath = `month_${currentMonthIndex}/${Date.now()}_${i}.${ext}`;
+
+    const { error: uploadError } = await sb.storage.from('photos').upload(storagePath, file, {
+      cacheControl: '3600', upsert: false
+    });
+    if (uploadError) { showToast('Upload failed 🥺 try again'); continue; }
+
+    const { data: urlData } = sb.storage.from('photos').getPublicUrl(storagePath);
+
+    const { data: inserted } = await sb.from('photos').insert({
+      month_index: currentMonthIndex,
+      storage_path: storagePath,
+      caption: caption,
+      is_video: isVideo
+    }).select().single();
+
+    images[currentMonthIndex].push({
+      id: inserted?.id,
+      src: urlData.publicUrl,
+      caption,
+      isVideo,
+      storagePath
+    });
+  }
+
+  progressBar.style.width = '100%';
+  progressLbl.textContent = 'All done! 💕';
+
+  setTimeout(() => {
+    closeModal('add-photo-modal');
+    renderViewerGrid(images[currentMonthIndex]);
+    renderGallery();
+    showToast(selectedFiles.length + ' photo' + (selectedFiles.length!==1?'s':'')+' added! 💕');
+    spawnConfetti();
+    selectedFiles = [];
+  }, 500);
+}
+
+// ============================================================
+//  SAVE NEW MONTH
+// ============================================================
+async function saveNewMonth() {
+  const month_label = document.getElementById('month-label-input').value.trim() || 'Month '+(memories.length+1);
+  const title       = document.getElementById('month-title-input').value.trim() || 'New Memory 💕';
+  const date_label  = document.getElementById('month-date-input').value.trim() || '';
+  const caption     = document.getElementById('month-caption-input').value.trim() || '';
+  const order_index = memories.length;
+
+  const { data } = await sb.from('months').insert({
+    order_index, month_label, title, date_label, caption
+  }).select().single();
+
+  memories.push({ id: data?.id, month: month_label, title, date: date_label, caption });
+  images.push([]);
+  closeModal('add-month-modal');
+  renderGallery();
+  showToast('Month added! 💕');
+}
+
+// ============================================================
+//  STORAGE HELPERS
+// ============================================================
+function saveMeta() { /* handled by Supabase */ }
+function saveImgs(i) { /* handled by Supabase */ }
+// ============================================================
+//  IMAGE COMPRESSION
+// ============================================================
+function compressImage(file, callback) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX=900; let w=img.width, h=img.height;
+      if(w>h&&w>MAX){ h=Math.round(h*MAX/w); w=MAX; }
+      else if(h>MAX){ w=Math.round(w*MAX/h); h=MAX; }
+      const c=document.createElement('canvas'); c.width=w; c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      callback(c.toDataURL('image/jpeg',0.72));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ============================================================
+//  TOAST
+// ============================================================
+function showToast(msg) {
+  const t = document.getElementById('toast'); t.textContent = msg;
+  t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
